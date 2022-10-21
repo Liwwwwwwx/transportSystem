@@ -12,7 +12,7 @@
       <div>
         <el-form :model="orderDetails.basicInfo" :rules="rules" ref="orderDetails" label-width="130px">
           <!-- 基本信息 -->
-          <div class="new-info">
+          <div class="basic-info info">
             <Header title="基本信息"></Header>
             <el-form-item label="委托号单" prop="orderId">
               <el-input placeholder="委托号单" v-model="orderDetails.basicInfo.orderId" :disabled="true"></el-input>
@@ -42,7 +42,7 @@
             </el-form-item>
           </div>
           <!-- 收发货人信息 -->
-          <div class="consignInfo">
+          <div class="consign-info info">
             <Header title="收发货人信息"></Header>
             <!-- 发货人信息 -->
             <div class="con-info-box">
@@ -78,31 +78,56 @@
             </div>
           </div>
           <!-- 货物明细 -->
-          <div class="goods-info">
+          <div class="goods-info info">
             <Header title="货物明细">
               <template slot="button">
-                <el-button @click="changeNewGoodsActive(-1)">添加</el-button>
+                <el-button @click="addNewData('goods')">添加</el-button>
               </template>
             </Header>
             <!-- 货物信息详情 -->
             <div class="goods-info-box">
               <el-table :data="orderDetails.goodsDetails" border style="width: 100%" ref="orderDetails.goodsDetails">
-                <el-table-column type="index" width="100" label="序号">
+                <el-table-column type="index" width="80" label="序号">
                 </el-table-column>
-                <el-table-column prop="goodsName" label="货物名称" width="160">
+                <el-table-column prop="goodsName" label="货物名称" width="180">
                 </el-table-column>
-                <el-table-column prop="goodsNumber" label="数量" width="160">
+                <el-table-column prop="goodsNumber" label="数量" width="180">
                 </el-table-column>
-                <el-table-column prop="goodsType" label="计量单位" width="160">
+                <el-table-column prop="goodsType" label="计量单位" width="180">
                 </el-table-column>
-                <el-table-column prop="goodsWeight" label="重量(KG)" width="160">
+                <el-table-column prop="goodsWeight" label="重量(KG)" width="180">
                 </el-table-column>
-                <el-table-column prop="goodsVolume" label="体积(m³)" width="160">
+                <el-table-column prop="goodsVolume" label="体积(m³)" width="180">
                 </el-table-column>
-                <el-table-column fixed="right" label="操作">
+                <el-table-column label="操作" width="120">
                   <template slot-scope="scope">
-                    <el-button @click="changeGoodsDetails(scope.row)" type="text" size="small">编辑</el-button>
-                    <el-button @click="deleteGoods(scope.row)" type="text" size="small">删除</el-button>
+                    <el-button @click="changeDetails(scope.row,'goodsDetails')" type="text" size="small">编辑</el-button>
+                    <el-button @click="deleteData(scope.row,'goodsDetails')" type="text" size="small">删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+          </div>
+          <div class="cost-info info">
+            <Header title="应收费用">
+              <template slot="button">
+                <el-button @click="addNewData('cost')">添加</el-button>
+              </template>
+            </Header>
+            <div class="cost-info-box">
+              <el-table :data="orderDetails.costDetails" border style="width: 100%" ref="orderDetails.costDetails">
+                <el-table-column type="index" width="80" label="序号">
+                </el-table-column>
+                <el-table-column prop="costName" label="费用名称" width="300">
+                </el-table-column>
+                <el-table-column prop="rate" label="税率(%)" width="300">
+                </el-table-column>
+                <el-table-column prop="cost" label="价税合计(元)" width="300">
+                </el-table-column>
+                <el-table-column label="操作" width="120">
+                  <template slot-scope="scope">
+                    <el-button @click="changeDetails(scope.row,'costDetails')" type="text" size="small">编辑</el-button>
+                    <el-button @click="deleteData(scope.row,'costDetails')" type="text" size="small">删除</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -114,8 +139,8 @@
       <SearchCustomer @closeBox="changeCustomerActive" @confirm="confirmCustomerInfo" v-show="isCustomerActive">
       </SearchCustomer>
       <!-- 添加货品信息 -->
-      <AddGoods :handleIndex="handleIndex" :goodsInfo="goodsData" @editGoodsData="editGoodsData" @confirmGoodsData="confirmGoodsData" @changeNewGoodsActive="changeNewGoodsActive"
-        v-if="isNewGoodsActive"></AddGoods>
+      <NewData :title="newDataTitle" :handleIndex="handleIndex" :handleData="handleData" @editData="editData"
+        @confirmData="confirmData" @changeActive="changeActive" v-if="isNewDataActive"></NewData>
     </template>
   </Base-Page>
 </template>
@@ -126,7 +151,7 @@ import Title from '@/components/title';
 import Header from '@/components/header';
 import SearchCustomer from '@/components/entrust/searchCustomer';
 import AddressInfo from '@/components/basic/address';
-import AddGoods from '@/components/entrust/addGood';
+import NewData from '@/components/entrust/addNewData';
 // 方法工具
 import { dateToString } from '@/utils/dateUtils';
 import { getUpperCharacter } from '@/utils/getCharacter';
@@ -144,7 +169,8 @@ export default {
     'Header': Header, // 信息标题组件
     'SearchCustomer': SearchCustomer, // 客户选择组件
     'AddressInfo': AddressInfo, // 地址选择组件
-    'AddGoods': AddGoods // 添加货物组件
+    // 'AddGoods': AddGoods, // 添加货物组件
+    'NewData': NewData
   },
   data() {
     // 取件日期校验
@@ -159,7 +185,7 @@ export default {
       }, 1000)
     }
     return {
-      orderDetails: {  
+      orderDetails: {
         basicInfo: {  // 基本信息和收发货人信息
           orderId: '',
           state: '未保存',
@@ -175,13 +201,21 @@ export default {
           consigneePhone: '',
           endAddress: ''
         },
-        goodsDetails: [] // 货物明细
+        goodsDetails: [], // 货物明细
+        costDetails: [
+          {
+            costName: '运费',
+            rate: 2,
+            cost: 4090
+          }
+        ] // 应收费用
       },
       key: 'neworder', // 订单详情key
       isCustomerActive: false, // 是否显示选择客户组件
-      isNewGoodsActive: false, // 是否显示添加物品信息组件
-      goodsData: {}, // 当前选中的货物信息
-      handleIndex:-1, // 当前选中货物信息的index
+      newDataTitle:'',
+      isNewDataActive: false, // 是否显示添加信息组件
+      handleData: {}, // 当前选中的货物、费用信息
+      handleIndex: -1, // 当前选中货物信息的index
       rules: { // 校验规则
         operatorPeople: [
           { required: true, message: '请输入操作人姓名', trigger: 'blur' },
@@ -289,53 +323,68 @@ export default {
     endAddressResult(results) {
       this.orderDetails.basicInfo.endAddress = results
     },
-    // 点击编辑货品信息事件
-    changeGoodsDetails(data) {
-      var index = this.orderDetails.goodsDetails.indexOf(data)
-      this.goodsData = data
-      this.changeNewGoodsActive(index)
+    // 添加货物信息
+    addNewData(title) {
+      this.newDataTitle = title == 'goods' ? '添加货物' : '添加费用'
+      this.changeActive(-1)
     },
-    // 修改货品信息
-    editGoodsData(data, index) {
-      this.orderDetails.goodsDetails[index] = data
-      this.isNewGoodsActive = !this.isNewGoodsActive
+
+    // 点击编辑事件
+    changeDetails(data, title) {
+      this.newDataTitle = title == 'goodsDetails' ? '添加货物' : '添加费用'
+      var index = this.orderDetails[title].indexOf(data)
+      this.handleData = data
+      this.changeActive(index)
     },
     // 点击删除货品信息事件
-    deleteGoods(data) {
-      var index = this.orderDetails.goodsDetails.indexOf(data)
-      this.orderDetails.goodsDetails.splice(index,1)
+    deleteData(data, title) {
+      var index = this.orderDetails[title].indexOf(data)
+      this.orderDetails[title].splice(index, 1)
+    },
+
+    // 修改货品信息
+    editData(data, index, title) {
+      console.log(data,index,title);
+      var label = title == '添加货物' ? 'goodsDetails' : 'costDetails'
+      this.$set(this.orderDetails[label],index,data)
+      this.isNewDataActive = !this.isNewDataActive
     },
     // 确认添加货物信息
-    confirmGoodsData(data) {
-      this.orderDetails.goodsDetails.push(data)
-      this.isNewGoodsActive = !this.isNewGoodsActive
+    confirmData(data, title) {
+      var label = title == '添加货物' ? 'goodsDetails' : 'costDetails'
+      this.orderDetails[label].push(data)
+      this.isNewDataActive = !this.isNewDataActive
     },
     // 修改添加货物页面状态 index -1：添加新货物 1获取第一行货物信息
-    changeNewGoodsActive(index) {
-      this.isNewGoodsActive = !this.isNewGoodsActive
+    changeActive(index) {
+      this.isNewDataActive = !this.isNewDataActive
       this.handleIndex = index
-    }
+    },
   }
 }
 </script>
 <style scoped>
-
-/* 表单样式 */
-.new-info {
+.info {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   border: #e4e4e4 1px solid;
+  width: 100%;
   margin-top: 15px;
 }
 
-.new-info>>>.el-form-item {
+.info>>>.el-table .el-table__cell {
+  text-align: center;
+}
+
+/* 基本信息样式 */
+.basic-info>>>.el-form-item {
   margin-top: 15px;
   margin-right: 15px;
   width: 345px;
 }
 
-.new-info>>>.el-select {
+.basic-info>>>.el-select {
   display: block;
 }
 
@@ -366,22 +415,16 @@ export default {
 }
 
 /* 表单样式 */
-.consignInfo {
-  display: flex;
+.consign-info {
   flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  border: #e4e4e4 1px solid;
-  width: 100%;
-  margin-top: 15px;
 }
 
-.consignInfo>>>.el-form-item {
+.consign-info>>>.el-form-item {
   margin: 15px 25px;
   width: 330px;
 }
 
-.consignInfo>>>.el-select {
+.consign-info>>>.el-select {
   display: block;
 }
 
@@ -396,16 +439,5 @@ export default {
 
 .address-box>>>.el-form-item__error {
   left: 120px;
-}
-
-/* 货物明细 */
-.goods-info {
-  width: 100%;
-  border: #e4e4e4 1px solid;
-  margin-top: 15px;
-}
-
-.goods-info>>>.el-table .el-table__cell {
-  text-align: center;
 }
 </style>
