@@ -37,8 +37,8 @@
 </template>
 <script>
 // 组件引用
-import Header from '@/components/header';
-import Info from '@/components/info';
+import Header from '@/components/basic/header';
+import Info from '@/components/basic/info';
 // 请求引用
 import Order from '@/http/order';
 // 方法引用

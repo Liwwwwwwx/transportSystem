@@ -78,8 +78,8 @@
 </template>
 <script>
 import BasePage from '@/components/BasePage';
-import Header from '@/components/header';
-import Title from '@/components/title';
+import Header from '@/components/basic/header';
+import Title from '@/components/basic/title';
 import { RouteConfig } from '@/router/config';
 export default {
   name: 'home',

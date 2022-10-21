@@ -47,7 +47,7 @@
 </template>
 <script>
 // 组件引用
-import Header from '@/components/header';
+import Header from '@/components/basic/header';
 
 export default {
   name: 'newData',

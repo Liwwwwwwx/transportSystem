@@ -75,9 +75,9 @@
 </template>
 <script>
 import BasePage from '@/components/BasePage';
-import Title from '@/components/title';
-import Header from '@/components/header';
-import Info from '@/components/info';
+import Title from '@/components/basic/title';
+import Header from '@/components/basic/header';
+import Info from '@/components/basic/info';
 import Order from '@/http/order';
 import { saveData, getData } from '@/utils/localStorageUtils';
 export default {

@@ -147,8 +147,8 @@
 <script>
 // 组件
 import BasePage from '@/components/BasePage';
-import Title from '@/components/title';
-import Header from '@/components/header';
+import Title from '@/components/basic/title';
+import Header from '@/components/basic/header';
 import SearchCustomer from '@/components/entrust/searchCustomer';
 import AddressInfo from '@/components/basic/address';
 import NewData from '@/components/entrust/addNewData';
