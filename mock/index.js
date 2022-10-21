@@ -54,9 +54,9 @@ module.exports = () => {
     }))
   }
   // 货物明细
-  function goodsInfo(id,i) {
+  function goodsInfo(i) {
     return Mock.mock({
-      goodsID: id,
+      id: i,
       "goodsName|1": [
         '可口可乐',
         '百事可乐',
@@ -65,7 +65,7 @@ module.exports = () => {
         '橙汁',
         '脉动'
       ],
-      orderID: data.order[i].orderId,
+      orderID: data.order[parseInt(i/5)].orderId,
       goodsNumber: Random.integer(130, 180),
       goodsType: '箱',
       goodsWeight: Random.integer(2950, 3050),
@@ -73,30 +73,19 @@ module.exports = () => {
     })
   }
 
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i < length*5; i++) {
     data.goods.push(
-      goodsInfo(1,i),
-      goodsInfo(2,i),
-      goodsInfo(3,i),
-      goodsInfo(4,i),
-      goodsInfo(5,i)
+      goodsInfo(i),
     )
   }
-
+  const costName = ['运费','制单费']
   // 应收费用
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i < length*2; i++) {
     data.orderCost.push(
       Mock.mock({
-        id: 1,
-        orderID: data.order[i].orderId,
-        costName: '运费',
-        rate: Random.integer(1, 3),
-        cost: Random.integer(4000, 5000),
-      }),
-      Mock.mock({
-        id: 2,
-        orderID: data.order[i].orderId,
-        costName: '制单费',
+        id: i,
+        orderID: data.order[parseInt(i/2)].orderId,
+        costName: costName[i%2],
         rate: Random.integer(1, 3),
         cost: Random.integer(4000, 5000),
       })
