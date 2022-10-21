@@ -121,6 +121,7 @@ export default {
 
 .info-container>>>.el-table .el-table__cell {
   text-align: center;
+  cursor: pointer;
 }
 
 /* 搜索 */

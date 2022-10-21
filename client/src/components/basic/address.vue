@@ -32,6 +32,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    addressResult:{
+      type:String,
+      default:''
     }
   },
   data() {
@@ -59,11 +63,14 @@ export default {
       }
     }
   },
-  created() {
+  mounted() {
     // 获取省份信息
     this.getAddressInfo('中国', 1, 'province')
-  },
-  computed: {
+    const reg = /.+?(省|市|自治区|自治州|县|区)/g
+    const results = this.addressResult.match(reg)
+    this.result.province = results[0]
+    this.result.city = results[1]
+    this.result.county = results[2]
   },
   methods: {
     // 获取位置信息

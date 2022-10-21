@@ -24,7 +24,7 @@
               <el-input v-model="orderDetails.basicInfo.customer" clearable @click.native="changeCustomerActive()">
               </el-input>
             </el-form-item>
-            <el-form-item label="取件日期" prop="takeDate">
+            <el-form-item label="取件日期" prop="takeDate" class="cust">
               <el-date-picker type="date" placeholder="选择日期" v-model="orderDetails.basicInfo.takeDate"></el-date-picker>
             </el-form-item>
             <el-form-item label="订单类型">
@@ -64,14 +64,14 @@
             <!-- 选择发货人地址 -->
             <div class="address-box">
               <el-form-item prop="startAddress" width="1100px" label-width="0">
-                <AddressInfo v-model="orderDetails.basicInfo.startAddress" title="发货地址"
+                <AddressInfo v-model="orderDetails.basicInfo.startAddress" :addressResult="orderDetails.basicInfo.startAddress" title="发货地址"
                   @getAddressResult="startAddressResult"></AddressInfo>
               </el-form-item>
             </div>
             <!-- 选择收货人地址 -->
             <div class="address-box">
               <el-form-item class="address-box" prop="endAddress" label-width="0">
-                <AddressInfo v-model="orderDetails.basicInfo.endAddress" title="收货地址"
+                <AddressInfo v-model="orderDetails.basicInfo.endAddress" :addressResult="orderDetails.basicInfo.endAddress" title="收货地址"
                   @getAddressResult="endAddressResult"></AddressInfo>
               </el-form-item>
             </div>
@@ -107,6 +107,7 @@
               </el-table>
             </div>
           </div>
+          <!-- 费用明细 -->
           <div class="cost-info info">
             <Header title="应收费用">
               <template slot="button">
@@ -180,7 +181,7 @@ export default {
         return callback(new Error('日期不能为空'))
       }
       setTimeout(() => {
-        if (value.getTime() <= this.orderDetails.basicInfo.operaDate.getTime()) {
+        if (value.getTime() <= new Date(this.orderDetails.basicInfo.operaDate).getTime()) {
           callback(new Error('取件日期应大于操作日期'))
         }
       }, 1000)
@@ -191,10 +192,10 @@ export default {
           orderId: '',
           state: '未保存',
           customer: '',
-          takeDate: '',
+          takeDate: null,
           type: '整车',
           operatoreople: '',
-          operaDate: '',
+          operaDate: null,
           consighnor: '',
           consighnorPhone: '',
           startAddress: '',
@@ -218,7 +219,7 @@ export default {
         ],
         takeDate: [
           { required: true, message: '请选择取件日期', trigger: 'change' },
-          // { validator: checkTakeDate, trigger: 'blur' }
+          { validator: checkTakeDate, trigger: 'blur' }
         ],
         consighnor: [
           { required: true, message: '请输入发货人姓名', trigger: 'blur' },
@@ -249,7 +250,7 @@ export default {
     }
   },
 
-  mounted() {
+  created() {
     this.initData() // 初始化信息
   },
   beforeDestroy() {
@@ -266,6 +267,7 @@ export default {
         this.orderDetails.basicInfo.orderId = orderId
       } else {
         this.orderDetails = orderdata
+        console.log(this.orderDetails);
       }
     },
     // 保存订单信息
