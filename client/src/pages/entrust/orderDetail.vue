@@ -38,7 +38,7 @@
         <Header :title="titles.goodsTitle"></Header>
         <div class="info-table">
           <el-table :data="orderDetails.goodsDetails" border style="width: 100%">
-            <el-table-column prop="goodsID" label="序号" width="180">
+            <el-table-column type="index" label="序号" width="180">
             </el-table-column>
             <el-table-column prop="goodsName" label="货物名称" width="199">
             </el-table-column>
@@ -57,7 +57,7 @@
         <Header :title="titles.costTitle"></Header>
         <div class="info-table">
           <el-table :data="orderDetails.orderCost" border style="width: 100%">
-            <el-table-column prop="id" label="序号" width="275">
+            <el-table-column type="index" label="序号" width="275">
             </el-table-column>
             <el-table-column prop="costName" label="货物名称" width="275">
             </el-table-column>
