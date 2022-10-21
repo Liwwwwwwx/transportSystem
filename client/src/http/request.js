@@ -17,8 +17,7 @@ export function request({
       timeout: 5000,
       withCredentials: true,
       headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'Content-Type': 'multipart/form-data',
+        'content-type': 'application/json',
       }
     })
 
@@ -45,8 +44,7 @@ export function requestAddress({
       timeout: 5000,
       withCredentials: true,
       headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'Content-Type': 'multipart/form-data',
+        'content-type': 'application/json',
       }
     })
 
