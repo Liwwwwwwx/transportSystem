@@ -21,8 +21,7 @@
               <el-input v-model="orderDetails.basicInfo.state" :disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="委托客户" prop="customer" class="cust">
-              <el-input v-model="orderDetails.basicInfo.customer" @click.native="changeCustomerActive()">
-                <i slot="suffix" class="el-input__icon el-icon-search"></i>
+              <el-input v-model="orderDetails.basicInfo.customer" clearable @click.native="changeCustomerActive()">
               </el-input>
             </el-form-item>
             <el-form-item label="取件日期" prop="takeDate">
@@ -159,6 +158,8 @@ import { randNum } from '@/utils/getRandomNum';
 import { saveData, getData, deleteData } from '@/utils/localStorageUtils';
 // 规则
 import { checkName, checkPhone } from '@/rules/index';
+// 接口
+import Order from '@/http/order';
 
 
 export default {
@@ -202,17 +203,11 @@ export default {
           endAddress: ''
         },
         goodsDetails: [], // 货物明细
-        costDetails: [
-          {
-            costName: '运费',
-            rate: 2,
-            cost: 4090
-          }
-        ] // 应收费用
+        costDetails: [] // 应收费用
       },
       key: 'neworder', // 订单详情key
       isCustomerActive: false, // 是否显示选择客户组件
-      newDataTitle:'',
+      newDataTitle: '',
       isNewDataActive: false, // 是否显示添加信息组件
       handleData: {}, // 当前选中的货物、费用信息
       handleIndex: -1, // 当前选中货物信息的index
@@ -223,7 +218,7 @@ export default {
         ],
         takeDate: [
           { required: true, message: '请选择取件日期', trigger: 'change' },
-          { validator: checkTakeDate, trigger: 'blur' }
+          // { validator: checkTakeDate, trigger: 'blur' }
         ],
         consighnor: [
           { required: true, message: '请输入发货人姓名', trigger: 'blur' },
@@ -242,7 +237,7 @@ export default {
           { validator: checkPhone, trigger: 'blur' }
         ],
         customer: [
-          { required: true, message: '请选择客户信息', trigger: 'blur' }
+          { required: true, message: '请选择客户信息', trigger: 'change' }
         ],
         startAddress: [
           { required: true, message: '请选择发货地址信息', trigger: 'change' },
@@ -280,20 +275,36 @@ export default {
     },
     // 提交订单信息
     submit(val) {
-      deleteData(this.key)
+      console.log(val);
+      // deleteData(this.key)
       this.$refs[val].validate((valid) => {
         console.log(valid);
         if (valid) {
-          this.$message({
-            message: '恭喜你,新增订单成功',
-            type: 'success'
-          })
+          console.log(this.orderDetails.goodsDetails.length);
+          if (!this.orderDetails.goodsDetails.length) {
+            this.$message({
+              message: '请填写货物信息',
+              type: 'warning'
+            })
+          } else if (!this.orderDetails.costDetails.length) {
+            this.$message({
+              message: '请填写费用信息',
+              type: 'warning'
+            })
+          } else {
+            Order.addNewOrder(this.orderDetails.basicInfo, this.orderDetails.goodsDetails, this.orderDetails.costDetails).then(res => {
+              this.$message({
+                message: '信息添加成功',
+                type: 'success'
+              })
+              this.$router.go(-1)
+            })
+          }
         } else {
           this.$message({
             message: '请填写必要信息',
             type: 'warning'
           })
-          return false
         }
       })
     },
@@ -344,9 +355,9 @@ export default {
 
     // 修改货品信息
     editData(data, index, title) {
-      console.log(data,index,title);
+      console.log(data, index, title);
       var label = title == '添加货物' ? 'goodsDetails' : 'costDetails'
-      this.$set(this.orderDetails[label],index,data)
+      this.$set(this.orderDetails[label], index, data)
       this.isNewDataActive = !this.isNewDataActive
     },
     // 确认添加货物信息
