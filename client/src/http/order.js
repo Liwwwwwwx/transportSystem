@@ -21,6 +21,12 @@ class Order {
       data
     })
   }
+  // 数据查询
+  serachOrder(customer, type, page) {
+    return request({
+      url:`/order?customer=${customer}&type=${type}&_page=${page}&_limit=10`
+    })
+  }
   // 新增货物数据
   addGoods(data) {
     return request({
