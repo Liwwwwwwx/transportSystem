@@ -33,9 +33,9 @@ export default {
       type: String,
       default: ''
     },
-    addressResult:{
-      type:String,
-      default:''
+    addressResult: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -63,14 +63,16 @@ export default {
       }
     }
   },
-  mounted() {
+  created() {
     // 获取省份信息
     this.getAddressInfo('中国', 1, 'province')
     const reg = /.+?(省|市|自治区|自治州|县|区)/g
-    const results = this.addressResult.match(reg)
-    this.result.province = results[0]
-    this.result.city = results[1]
-    this.result.county = results[2]
+    if (this.addressResult !== '') {
+      const results = this.addressResult.match(reg)
+      this.result.province = results[0]
+      this.result.city = results[1]
+      this.result.county = results[2]
+    }
   },
   methods: {
     // 获取位置信息
@@ -81,7 +83,7 @@ export default {
     },
     // 获取城市信息
     searchCity() {
-      if(this.result.province) {
+      if (this.result.province) {
         this.getAddressInfo(this.result.province, 1, 'city')
       }
       this.result.county = ''
@@ -90,7 +92,7 @@ export default {
     searchCounty() {
       var specialCity = ['天津市', '北京市', '重庆市', '上海市']
       var sub_main = specialCity.indexOf(this.result.city) < 0 ? 1 : 2
-      if(this.result.city) {
+      if (this.result.city) {
         this.getAddressInfo(this.result.city, sub_main, 'county')
       }
     },
@@ -126,5 +128,4 @@ export default {
 .selectInfo>>>.el-input__inner {
   width: 260px !important;
 }
-
 </style>

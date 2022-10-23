@@ -18,7 +18,7 @@
               <el-input placeholder="委托号单" v-model="orderDetails.basicInfo.orderId" :disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="当前状态" prop="state">
-              <el-input v-model="orderDetails.basicInfo.state" :disabled="true"></el-input>
+              <el-input v-model="orderState" :disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="委托客户" prop="customer" class="cust">
               <el-input v-model="orderDetails.basicInfo.customer" clearable @click.native="changeCustomerActive()">
@@ -190,7 +190,7 @@ export default {
       orderDetails: {
         basicInfo: {  // 基本信息和收发货人信息
           orderId: '',
-          state: '未保存',
+          state: '',
           customer: '',
           takeDate: null,
           type: '整车',
@@ -206,6 +206,7 @@ export default {
         goodsDetails: [], // 货物明细
         costDetails: [] // 应收费用
       },
+      orderState:'未保存',
       key: 'neworder', // 订单详情key
       isCustomerActive: false, // 是否显示选择客户组件
       newDataTitle: '',
@@ -272,7 +273,7 @@ export default {
     },
     // 保存订单信息
     saveOrderData() {
-      this.orderDetails.basicInfo.state = '已保存'
+      this.orderState = '已保存'
       saveData(this.key, this.orderDetails)
     },
     // 提交订单信息

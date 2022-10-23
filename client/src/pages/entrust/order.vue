@@ -46,17 +46,17 @@
             <el-table :data="orderDatas" border style="width: 100%">
               <el-table-column prop="id" label="序号" width="50">
               </el-table-column>
-              <el-table-column prop="orderId" label="委托单号" width="160">
+              <el-table-column prop="orderId" label="委托单号" width="155">
               </el-table-column>
               <el-table-column prop="customer" label="委托客户" width="78">
               </el-table-column>
-              <el-table-column prop="totalNumber" label="总数量" width="70">
+              <el-table-column prop="state" label="订单状态" width="80">
               </el-table-column>
               <el-table-column prop="totalWeight" label="总重量(KG)" width="100">
               </el-table-column>
               <el-table-column prop="consighnor" label="发货人" width="78">
               </el-table-column>
-              <el-table-column prop="consighnorPhone" label="发货人电话" width="110">
+              <el-table-column prop="consighnorPhone" label="发货人电话" width="105">
               </el-table-column>
               <el-table-column prop="startAddress" label="起点" width="108">
               </el-table-column>
@@ -104,9 +104,9 @@ export default {
         arrived: '已到货'
       },
       fiflterInfo:{
-        fiflterOrderId:null,
-        fiflterCustomer:null,
-        fiflterState:null,
+        fiflterOrderId:'',
+        fiflterCustomer:'',
+        fiflterState:'',
       },
       orderDatas: [],
       currentPage: 1,
@@ -123,15 +123,12 @@ export default {
   methods: {
     // 页面切换
     handleCurrentChange(val) {
-      if (val == 1 && this.fiflterInfo.fiflterCustomer !== '') {
-        console.log(123);
+      if (val == 1 && this.fiflterInfo.fiflterCustomer == '') {
         var orderData = getData('firstOrderData')
         this.orderDatas = orderData
-        console.log(this.orderDatas);
       } else {
-        console.log(234);
         let info = this.fiflterInfo
-        info.fiflterCustomer == '' ? this.getOrderData(val, 'orderData') : this.getSerachOrder(info.fiflterCustomer, info.fiflterState, val)
+        info.fiflterCustomer == '' ? this.getOrderData(val) : this.getSerachOrder(info.fiflterCustomer, info.fiflterState, val)
       }
     },
     // 点击查看操作
@@ -150,14 +147,17 @@ export default {
     // 获取order信息
     getOrderData(val) {
       Order.getOrderDatas(val).then(res => {
+        console.log(res);
         this.orderDatas = res
+        if(val == 1) {
+          saveData('firstOrderData',res)
+        }
       })
     },
     // 获取查询条件信息
     getSerachOrder(fiflterCustomer, fiflterState, page) {
       Order.serachOrder(fiflterCustomer, fiflterState, page).then(res => {
         this.orderDatas = res
-        console.log(res);
         if(page == 1) {
           saveData('firstOrderData',res)
         }

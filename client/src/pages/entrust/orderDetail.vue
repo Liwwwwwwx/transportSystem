@@ -118,10 +118,10 @@ export default {
       isShow: false // 是否显示
     }
   },
-  mounted() {
+  created() {
     var orderId = this.$route.query.orderId
     var orderDetail = getData('orderDetails')
-    if(orderId === orderDetail.basicInfo.orderId) {
+    if(orderDetail.length !== 0 && orderId === orderDetail.basicInfo.orderId) {
       this.orderDetails = orderDetail
     }else {
       this.getOrderDetails(orderId)
