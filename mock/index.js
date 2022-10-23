@@ -38,7 +38,10 @@ module.exports = () => {
         '散货'
       ],
       "state|1":[
-        '已保存'
+        '已下发',
+        '部分运输',
+        '运输中',
+        '已到货'
       ],
       totalNumber: Random.integer(60, 100),
       totalWeight: Random.integer(2900, 3100),
